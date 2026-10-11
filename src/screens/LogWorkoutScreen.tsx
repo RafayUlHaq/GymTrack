@@ -1,4 +1,5 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -13,13 +14,18 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLogs } from '../context/LogContext';
+import { getColors, useTheme } from '../context/ThemeContext';
 import { RootStackParamList } from '../types';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'LogWorkout'>;
+type NavProp = NativeStackNavigationProp<RootStackParamList, 'LogWorkout'>;
+type RoutePropType = RouteProp<RootStackParamList, 'LogWorkout'>;
 
-export function LogWorkoutScreen({ route, navigation }: Props) {
-  // Requirement: display received route params
+export function LogWorkoutScreen() {
+  const navigation = useNavigation<NavProp>();
+  const route = useRoute<RoutePropType>();
   const { exercise, categoryName } = route.params;
+  const { isDark } = useTheme();
+  const C = getColors(isDark);
 
   const { addLog } = useLogs();
   const [sets, setSets] = useState(String(exercise.sets));
@@ -52,7 +58,7 @@ export function LogWorkoutScreen({ route, navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]} edges={['bottom']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
@@ -62,7 +68,7 @@ export function LogWorkoutScreen({ route, navigation }: Props) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Exercise info from route params */}
+          {/* Exercise info card — always dark for contrast */}
           <View style={styles.infoCard}>
             <Text style={styles.infoCategory}>{categoryName}</Text>
             <Text style={styles.infoName}>{exercise.name}</Text>
@@ -79,72 +85,58 @@ export function LogWorkoutScreen({ route, navigation }: Props) {
             </View>
           </View>
 
-          <Text style={styles.sectionLabel}>Log Your Performance</Text>
+          <Text style={[styles.sectionLabel, { color: C.sectionLabel }]}>
+            Log Your Performance
+          </Text>
 
-          <View style={styles.formCard}>
+          <View style={[styles.formCard, { backgroundColor: C.card }]}>
             <View style={styles.field}>
-              <Text style={styles.label}>Sets</Text>
+              <Text style={[styles.label, { color: C.text }]}>Sets</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: C.inputBg, borderColor: C.border, color: C.text }]}
                 value={sets}
                 onChangeText={setSets}
                 keyboardType="numeric"
                 placeholder="e.g. 4"
-                placeholderTextColor="#bbb"
+                placeholderTextColor={isDark ? '#555' : '#bbb'}
               />
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.label}>Reps</Text>
+              <Text style={[styles.label, { color: C.text }]}>Reps</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: C.inputBg, borderColor: C.border, color: C.text }]}
                 value={reps}
                 onChangeText={setReps}
                 placeholder="e.g. 8-10"
-                placeholderTextColor="#bbb"
+                placeholderTextColor={isDark ? '#555' : '#bbb'}
               />
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.label}>Weight</Text>
+              <Text style={[styles.label, { color: C.text }]}>Weight</Text>
               <View style={styles.weightRow}>
                 <TextInput
-                  style={[styles.input, { flex: 1, marginRight: 10 }]}
+                  style={[styles.input, { flex: 1, marginRight: 10, backgroundColor: C.inputBg, borderColor: C.border, color: C.text }]}
                   value={weight}
                   onChangeText={setWeight}
                   keyboardType="decimal-pad"
                   placeholder="e.g. 60"
-                  placeholderTextColor="#bbb"
+                  placeholderTextColor={isDark ? '#555' : '#bbb'}
                 />
                 <TouchableOpacity
-                  style={[
-                    styles.unitBtn,
-                    unit === 'kg' && styles.unitBtnActive,
-                  ]}
+                  style={[styles.unitBtn, { backgroundColor: C.inputBg, borderColor: C.border }, unit === 'kg' && styles.unitBtnActive]}
                   onPress={() => setUnit('kg')}
                 >
-                  <Text
-                    style={[
-                      styles.unitBtnText,
-                      unit === 'kg' && styles.unitBtnTextActive,
-                    ]}
-                  >
+                  <Text style={[styles.unitBtnText, { color: C.subText }, unit === 'kg' && styles.unitBtnTextActive]}>
                     kg
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[
-                    styles.unitBtn,
-                    unit === 'lbs' && styles.unitBtnActive,
-                  ]}
+                  style={[styles.unitBtn, { backgroundColor: C.inputBg, borderColor: C.border }, unit === 'lbs' && styles.unitBtnActive]}
                   onPress={() => setUnit('lbs')}
                 >
-                  <Text
-                    style={[
-                      styles.unitBtnText,
-                      unit === 'lbs' && styles.unitBtnTextActive,
-                    ]}
-                  >
+                  <Text style={[styles.unitBtnText, { color: C.subText }, unit === 'lbs' && styles.unitBtnTextActive]}>
                     lbs
                   </Text>
                 </TouchableOpacity>
@@ -162,14 +154,8 @@ export function LogWorkoutScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F0F2F5',
-  },
-  scroll: {
-    padding: 16,
-    paddingBottom: 40,
-  },
+  container: { flex: 1 },
+  scroll: { padding: 16, paddingBottom: 40 },
   infoCard: {
     backgroundColor: '#1a1a2e',
     borderRadius: 16,
@@ -183,22 +169,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     marginBottom: 4,
   },
-  infoName: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#fff',
-    marginBottom: 10,
-  },
-  infoDesc: {
-    fontSize: 14,
-    color: '#bbb',
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
+  infoName: { fontSize: 24, fontWeight: '800', color: '#fff', marginBottom: 10 },
+  infoDesc: { fontSize: 14, color: '#bbb', lineHeight: 20, marginBottom: 16 },
+  infoRow: { flexDirection: 'row', gap: 10 },
   infoBadge: {
     flex: 1,
     backgroundColor: 'rgba(255,255,255,0.08)',
@@ -206,26 +179,16 @@ const styles = StyleSheet.create({
     padding: 12,
     alignItems: 'center',
   },
-  infoBadgeLabel: {
-    fontSize: 11,
-    color: '#888',
-    marginBottom: 4,
-  },
-  infoBadgeValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#fff',
-  },
+  infoBadgeLabel: { fontSize: 11, color: '#888', marginBottom: 4 },
+  infoBadgeValue: { fontSize: 18, fontWeight: '700', color: '#fff' },
   sectionLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#888',
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginBottom: 10,
   },
   formCard: {
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
@@ -236,58 +199,31 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  field: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#555',
-  },
+  field: { gap: 6 },
+  label: { fontSize: 13, fontWeight: '600' },
   input: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 16,
-    color: '#1a1a1a',
-    backgroundColor: '#FAFAFA',
   },
-  weightRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+  weightRow: { flexDirection: 'row', alignItems: 'center' },
   unitBtn: {
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     marginLeft: 6,
-    backgroundColor: '#FAFAFA',
   },
-  unitBtnActive: {
-    backgroundColor: '#1a1a2e',
-    borderColor: '#1a1a2e',
-  },
-  unitBtnText: {
-    fontSize: 14,
-    color: '#888',
-    fontWeight: '600',
-  },
-  unitBtnTextActive: {
-    color: '#fff',
-  },
+  unitBtnActive: { backgroundColor: '#1a1a2e', borderColor: '#1a1a2e' },
+  unitBtnText: { fontSize: 14, fontWeight: '600' },
+  unitBtnTextActive: { color: '#fff' },
   saveBtn: {
     backgroundColor: '#27AE60',
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
   },
-  saveBtnText: {
-    color: '#fff',
-    fontSize: 17,
-    fontWeight: '700',
-  },
+  saveBtnText: { color: '#fff', fontSize: 17, fontWeight: '700' },
 });

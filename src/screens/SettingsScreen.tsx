@@ -9,10 +9,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLogs } from '../context/LogContext';
+import { getColors, useTheme } from '../context/ThemeContext';
 
 export function SettingsScreen() {
   const { logs, clearLogs } = useLogs();
-  const [darkMode, setDarkMode] = React.useState(false);
+  const { isDark, toggleDark } = useTheme();
+  const C = getColors(isDark);
   const [notifications, setNotifications] = React.useState(true);
 
   const handleClearLogs = () => {
@@ -38,34 +40,35 @@ export function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <Text style={styles.sectionLabel}>Preferences</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]} edges={['bottom']}>
+      <Text style={[styles.sectionLabel, { color: C.sectionLabel }]}>Preferences</Text>
 
-      <View style={styles.group}>
+      <View style={[styles.group, { backgroundColor: C.card }]}>
         <View style={styles.row}>
           <View style={styles.rowLeft}>
             <Text style={styles.rowIcon}>🌙</Text>
             <View>
-              <Text style={styles.rowTitle}>Dark Mode</Text>
-              <Text style={styles.rowSub}>Toggle dark appearance</Text>
+              <Text style={[styles.rowTitle, { color: C.text }]}>Dark Mode</Text>
+              <Text style={[styles.rowSub, { color: C.subText }]}>Toggle dark appearance</Text>
             </View>
           </View>
+          {/* Requirement: toggle actually changes the app theme */}
           <Switch
-            value={darkMode}
-            onValueChange={setDarkMode}
+            value={isDark}
+            onValueChange={toggleDark}
             trackColor={{ false: '#ddd', true: '#27AE60' }}
             thumbColor="#fff"
           />
         </View>
 
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: C.divider }]} />
 
         <View style={styles.row}>
           <View style={styles.rowLeft}>
             <Text style={styles.rowIcon}>🔔</Text>
             <View>
-              <Text style={styles.rowTitle}>Reminders</Text>
-              <Text style={styles.rowSub}>Daily workout reminder</Text>
+              <Text style={[styles.rowTitle, { color: C.text }]}>Reminders</Text>
+              <Text style={[styles.rowSub, { color: C.subText }]}>Daily workout reminder</Text>
             </View>
           </View>
           <Switch
@@ -77,45 +80,45 @@ export function SettingsScreen() {
         </View>
       </View>
 
-      <Text style={styles.sectionLabel}>Data</Text>
+      <Text style={[styles.sectionLabel, { color: C.sectionLabel }]}>Data</Text>
 
-      <View style={styles.group}>
+      <View style={[styles.group, { backgroundColor: C.card }]}>
         <View style={styles.row}>
           <View style={styles.rowLeft}>
             <Text style={styles.rowIcon}>📋</Text>
             <View>
-              <Text style={styles.rowTitle}>Workout Logs</Text>
-              <Text style={styles.rowSub}>
+              <Text style={[styles.rowTitle, { color: C.text }]}>Workout Logs</Text>
+              <Text style={[styles.rowSub, { color: C.subText }]}>
                 {logs.length} session{logs.length !== 1 ? 's' : ''} recorded
               </Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: C.divider }]} />
 
         <TouchableOpacity style={styles.row} onPress={handleClearLogs}>
           <View style={styles.rowLeft}>
             <Text style={styles.rowIcon}>🗑️</Text>
             <View>
-              <Text style={[styles.rowTitle, { color: '#E74C3C' }]}>
-                Clear All Logs
+              <Text style={[styles.rowTitle, { color: '#E74C3C' }]}>Clear All Logs</Text>
+              <Text style={[styles.rowSub, { color: C.subText }]}>
+                Permanently remove workout history
               </Text>
-              <Text style={styles.rowSub}>Permanently remove workout history</Text>
             </View>
           </View>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.sectionLabel}>About</Text>
+      <Text style={[styles.sectionLabel, { color: C.sectionLabel }]}>About</Text>
 
-      <View style={styles.group}>
+      <View style={[styles.group, { backgroundColor: C.card }]}>
         <View style={styles.row}>
           <View style={styles.rowLeft}>
             <Text style={styles.rowIcon}>📱</Text>
             <View>
-              <Text style={styles.rowTitle}>TrackGym</Text>
-              <Text style={styles.rowSub}>Version 1.0.0</Text>
+              <Text style={[styles.rowTitle, { color: C.text }]}>TrackGym</Text>
+              <Text style={[styles.rowSub, { color: C.subText }]}>Version 1.0.0</Text>
             </View>
           </View>
         </View>
@@ -127,12 +130,10 @@ export function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F0F2F5',
   },
   sectionLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#888',
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginHorizontal: 20,
@@ -140,7 +141,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   group: {
-    backgroundColor: '#fff',
     borderRadius: 14,
     marginHorizontal: 16,
     shadowColor: '#000',
@@ -167,16 +167,13 @@ const styles = StyleSheet.create({
   rowTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1a1a1a',
   },
   rowSub: {
     fontSize: 12,
-    color: '#888',
     marginTop: 1,
   },
   divider: {
     height: 1,
-    backgroundColor: '#F0F2F5',
     marginHorizontal: 16,
   },
 });

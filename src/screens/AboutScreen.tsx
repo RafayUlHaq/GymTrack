@@ -1,8 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getColors, useTheme } from '../context/ThemeContext';
 
 export function AboutScreen() {
+  const { isDark } = useTheme();
+  const C = getColors(isDark);
+
   const features = [
     { icon: '💪', label: 'Browse muscle group workouts' },
     { icon: '📝', label: 'Log sets, reps and weight' },
@@ -11,7 +15,7 @@ export function AboutScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]} edges={['bottom']}>
       <View style={styles.hero}>
         <Text style={styles.heroEmoji}>🏋️</Text>
         <Text style={styles.heroTitle}>TrackGym</Text>
@@ -22,17 +26,18 @@ export function AboutScreen() {
         </Text>
       </View>
 
-      <Text style={styles.sectionLabel}>What you can do</Text>
-      <View style={styles.featureList}>
+      <Text style={[styles.sectionLabel, { color: C.sectionLabel }]}>What you can do</Text>
+
+      <View style={[styles.featureList, { backgroundColor: C.card }]}>
         {features.map((f, i) => (
           <View key={i} style={styles.featureRow}>
             <Text style={styles.featureIcon}>{f.icon}</Text>
-            <Text style={styles.featureLabel}>{f.label}</Text>
+            <Text style={[styles.featureLabel, { color: C.text }]}>{f.label}</Text>
           </View>
         ))}
       </View>
 
-      <Text style={styles.footer}>
+      <Text style={[styles.footer, { color: C.subText }]}>
         Built with React Native &amp; Expo · SMD Assignment 2
       </Text>
     </SafeAreaView>
@@ -40,31 +45,15 @@ export function AboutScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F0F2F5',
-  },
+  container: { flex: 1 },
   hero: {
     alignItems: 'center',
     backgroundColor: '#1a1a2e',
     padding: 36,
   },
-  heroEmoji: {
-    fontSize: 56,
-    marginBottom: 10,
-  },
-  heroTitle: {
-    fontSize: 30,
-    fontWeight: '800',
-    color: '#fff',
-    letterSpacing: 1,
-  },
-  heroVersion: {
-    fontSize: 13,
-    color: '#888',
-    marginTop: 4,
-    marginBottom: 14,
-  },
+  heroEmoji: { fontSize: 56, marginBottom: 10 },
+  heroTitle: { fontSize: 30, fontWeight: '800', color: '#fff', letterSpacing: 1 },
+  heroVersion: { fontSize: 13, color: '#888', marginTop: 4, marginBottom: 14 },
   heroDesc: {
     fontSize: 14,
     color: '#aaa',
@@ -75,7 +64,6 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#888',
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginHorizontal: 20,
@@ -83,7 +71,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   featureList: {
-    backgroundColor: '#fff',
     borderRadius: 14,
     marginHorizontal: 16,
     padding: 8,
@@ -99,18 +86,7 @@ const styles = StyleSheet.create({
     padding: 12,
     gap: 14,
   },
-  featureIcon: {
-    fontSize: 22,
-  },
-  featureLabel: {
-    fontSize: 15,
-    color: '#1a1a1a',
-    fontWeight: '500',
-  },
-  footer: {
-    textAlign: 'center',
-    color: '#bbb',
-    fontSize: 12,
-    marginTop: 32,
-  },
+  featureIcon: { fontSize: 22 },
+  featureLabel: { fontSize: 15, fontWeight: '500' },
+  footer: { textAlign: 'center', fontSize: 12, marginTop: 32 },
 });

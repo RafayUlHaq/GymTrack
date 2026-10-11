@@ -1,5 +1,4 @@
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import {
   FlatList,
@@ -9,32 +8,35 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getColors, useTheme } from '../context/ThemeContext';
 import { WORKOUT_CATEGORIES } from '../data/workouts';
-import { RootStackParamList, WorkoutCategory } from '../types';
-
-type NavProp = NativeStackNavigationProp<RootStackParamList, 'DrawerRoot'>;
+import { WorkoutCategory } from '../types';
 
 export function HomeScreen() {
-  const navigation = useNavigation<NavProp>();
+  const navigation = useNavigation<any>();
+  const { isDark } = useTheme();
+  const C = getColors(isDark);
 
   const renderItem = ({ item }: { item: WorkoutCategory }) => (
     <TouchableOpacity
-      style={[styles.card, { borderLeftColor: item.color }]}
+      style={[styles.card, { backgroundColor: C.card, borderLeftColor: item.color }]}
       onPress={() => navigation.navigate('WorkoutDetail', { category: item })}
       activeOpacity={0.75}
     >
       <Text style={styles.emoji}>{item.emoji}</Text>
       <View style={styles.cardText}>
-        <Text style={styles.cardTitle}>{item.name}</Text>
-        <Text style={styles.cardSub}>{item.exercises.length} exercises</Text>
+        <Text style={[styles.cardTitle, { color: C.text }]}>{item.name}</Text>
+        <Text style={[styles.cardSub, { color: C.subText }]}>
+          {item.exercises.length} exercises
+        </Text>
       </View>
       <Text style={[styles.arrow, { color: item.color }]}>›</Text>
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <Text style={styles.heading}>Choose a Muscle Group</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]} edges={['bottom']}>
+      <Text style={[styles.heading, { color: C.sectionLabel }]}>Choose a Muscle Group</Text>
       <FlatList
         data={WORKOUT_CATEGORIES}
         keyExtractor={(item) => item.id}
@@ -47,14 +49,10 @@ export function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F0F2F5',
-  },
+  container: { flex: 1 },
   heading: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#888',
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginHorizontal: 20,
@@ -68,7 +66,6 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
     borderRadius: 14,
     padding: 18,
     marginVertical: 6,
@@ -79,25 +76,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  emoji: {
-    fontSize: 32,
-    marginRight: 14,
-  },
-  cardText: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-  },
-  cardSub: {
-    fontSize: 13,
-    color: '#888',
-    marginTop: 2,
-  },
-  arrow: {
-    fontSize: 28,
-    fontWeight: '300',
-  },
+  emoji: { fontSize: 32, marginRight: 14 },
+  cardText: { flex: 1 },
+  cardTitle: { fontSize: 18, fontWeight: '700' },
+  cardSub: { fontSize: 13, marginTop: 2 },
+  arrow: { fontSize: 28, fontWeight: '300' },
 });
